@@ -1,0 +1,18 @@
+﻿# Python
+__pycache__/
+*.pyc
+.pytest_cache/
+.mypy_cache/
+
+# Virtualenv
+.venv/
+
+# Outputs / Spark artifacts
+output/
+*.crc
+_SUCCESS
+
+# OS / Editor
+.vscode/
+.DS_Store
+Thumbs.db

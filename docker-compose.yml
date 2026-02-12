@@ -1,0 +1,32 @@
+services:
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: sicoop
+      POSTGRES_PASSWORD: sicoop
+      POSTGRES_DB: sicoopdb
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./docker/postgres/schema.sql:/docker-entrypoint-initdb.d/01_schema.sql
+      - ./docker/postgres/seed.sql:/docker-entrypoint-initdb.d/02_seed.sql
+
+    # Opcional, mas ajuda MUITO o "esperar o postgres" no run_local.sh
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U sicoop -d sicoopdb"]
+      interval: 3s
+      timeout: 3s
+      retries: 30
+
+  spark:
+    build:
+      context: ./docker/spark
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./src:/opt/app/src
+      - ./output:/opt/output
+
+    # Mantém o container vivo para o run_local.sh executar o spark-submit via "docker compose exec"
+    command: ["bash", "-lc", "tail -f /dev/null"]
